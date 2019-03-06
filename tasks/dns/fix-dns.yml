@@ -1,0 +1,33 @@
+---
+# Disable DNS information
+- name: Get all interface configuration files
+  raw: find /etc/sysconfig/network-scripts/ -type f -name "ifcfg-*"
+  register: ifcfg_files
+- debug:
+    msg: "Files that we are performing changes {{ ifcfg_files.stdout_lines }}"
+
+# remove DNS configuration from the interfaces config files
+- name: Disable DNS configuration from interface definition
+  lineinfile:
+    #path: /etc/sysconfig/network-scripts/ifcfg-eth0
+    path: "{{ item }}"
+    regexp: '^DNS'
+    state: absent
+  with_items: "{{ ifcfg_files.stdout_lines }}"
+
+# TO DELETE
+# remove DNS servers from /etc/resolv.conf
+#- name: Disable DNS configuration from interface definition
+#  lineinfile:
+#    path: /etc/resolv.conf
+#    regexp: '^DNS'
+#    state: absent
+  
+# create new DNS entry for every DNS listed
+- name: Create name server for local DNS
+  lineinfile:
+    path: /etc/resolv.conf
+    line: "nameserver {{ item }}"
+    state: present
+  with_items: "{{ local_dns }}"
+

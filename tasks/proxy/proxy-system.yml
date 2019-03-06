@@ -1,0 +1,24 @@
+---
+# Remove all proxies informations
+- name: Find block automatically generated to remove
+  blockinfile:
+    path: /etc/profile
+    marker: "# Ansible manager block -- by autoconfig tool"
+    content: ""
+
+- name: Cleanup /etc/profile file
+  lineinfile:
+    path: /etc/profile
+    regexp: '^http_proxy|^https_proxy|^HTTP_PROXY|^HTTPS_PROXY'
+    state: absent
+
+- name: YUM add new proxy configuration
+  blockinfile:
+    path: /etc/profile
+    marker: "# Ansible manager block -- by autoconfig tool"
+    block: |
+      proxy=http://{{ http_proxy }}:{{ http_proxy_port }}
+      proxy_username={{ proxy_username }}
+      proxy_password={{ proxy_password }}
+      insertafter: '^[main]'
+      state: present

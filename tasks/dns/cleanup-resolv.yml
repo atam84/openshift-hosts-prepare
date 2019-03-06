@@ -1,0 +1,8 @@
+---
+- name: Cleanup existing /etc/resolv.conf entries
+  lineinfile:
+    path: /etc/resolv.conf
+    regexp: '^nameserver'
+    create: yes
+    backup: yes
+    state: absent

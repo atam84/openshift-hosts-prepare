@@ -1,0 +1,6 @@
+---
+- name: Enable services on startup
+  service:
+    name: "{{ item }}"
+    enabled: yes
+  with_items: "{{ services_list }}"

@@ -1,0 +1,17 @@
+---
+# Remove all proxies informations
+- name: YUM remove old proxy configuration
+  lineinfile:
+    path: /etc/yum.conf
+    regexp: '^proxy'
+    state: absent
+
+- name: YUM add new proxy configuration
+  blockinfile:
+    path: /etc/yum.conf
+    block: |
+      proxy=http://{{ http_proxy }}:{{ http_proxy_port }}
+      proxy_username={{ proxy_username }}
+      proxy_password={{ proxy_password }}
+    insertafter: '^[main]'
+    state: present

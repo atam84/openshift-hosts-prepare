@@ -1,0 +1,51 @@
+---
+- name: Cleanup and backup /etc/dnsmasq.conf
+  lineinfile:
+    path: /etc/dnsmasq.conf
+    regexp: '.*'
+    backup: yes
+    state: absent
+
+- name: Configure dnsmasq
+  blockinfile:
+    path: /etc/dnsmasq.conf
+    create: yes
+    block: |
+      domain-needed
+      bogus-priv
+      resolv-file=/etc/resolv.dnsmasq.conf
+      strict-order
+      server=/./{{ local_dns }}
+      local=/{{ domain_name }}/{{ ansible_default_ipv4.address }}
+      address=/.{{ sub_domain_name }}/{{ ansible_default_ipv4.address }}
+      expand-hosts
+      conf-dir=/etc/dnsmasq.d,.rpmnew,.rpmsave,.rpmorig
+
+- name: Cleanup and backup /etc/resolv.dnsmasq.conf
+  lineinfile:
+    path: /etc/resolv.dnsmasq.conf
+    regexp: '.*'
+    create: yes
+    backup: yes
+    state: absent
+
+- name: Create /etc/resolv.dnsmasq.conf entry
+  lineinfile:
+    path: /etc/resolv.dnsmasq.conf
+    line: "nameserver {{ local_dns }}"
+    create: yes
+    backup: yes
+    state: present
+
+- import_tasks: cleanup-resolv.yml
+
+- name: Modify /etc/resolv.conf to resolv local
+  lineinfile:
+    path: /etc/resolv.conf
+    line: "nameserver {{ ansible_default_ipv4.address }}"
+    state: present
+
+- name: Restart dnsmasq
+  service:
+    name: dnsmasq
+    state: restarted

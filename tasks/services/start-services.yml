@@ -1,0 +1,6 @@
+---
+- name: Start services "{{ services_list }}"
+  service:
+    name: "{{ item }}"
+    state: restarted
+  with_items: "{{ services_list }}"

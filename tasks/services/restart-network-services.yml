@@ -1,0 +1,7 @@
+---
+- name: restart network services
+  service:
+    name: "{{ item }}"
+    state: restarted
+  register: restarted_services
+  with_items: "{{ network_services }}"

@@ -1,0 +1,39 @@
+---
+  - name: Cleanup /etc/sysconfig/docker-storage-setup configuration
+    lineinfile:
+      path: /etc/sysconfig/docker-storage-setup
+      line: 'STORAGE_DRIVER=overlay2'
+      state: absent
+    register: cleanup_docker_storage
+  - debug:
+      msg: "/etc/sysconfig/docker-storage-setup is clean"
+
+  - name: Configure /etc/sysconfig/docker-storage-setup
+    lineinfile:
+      path: /etc/sysconfig/docker-storage-setup
+      line: "{{ item }}"
+      state: present
+    register: docker_storage_setup
+    with_items:
+      - "DEVS={{ host_block_device }}"
+      - "VG={{ host_vg }}"
+  - debug:
+      msg: "/etc/sysconfig/docker-storage-setup is reconfigured"
+    when: item.changed
+    with_items: "{{ docker_storage_setup.results }}"
+
+  - name: Cleanup /etc/sysconfig/docker-storage configuration
+    lineinfile:
+      path: /etc/sysconfig/docker-storage
+      line: '^DOCKER_STORAGE_OPTIONS'
+      state: absent
+    when: item.changed
+    with_items: "{{ docker_storage_setup.results }}"
+
+#  - name: Start creation of thin pools
+#    shell: /bin/docker-storage-setup
+#    register: docker_storage_setup_result
+#    when: "{{ docker_storage_setup.changed }}"
+#
+#  - debug:
+#      msg: "/bin/docker-storage-setup {{ docker_storage_setup_result.stdout }}"

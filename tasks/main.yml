@@ -1,0 +1,46 @@
+---
+# tasks file for openshift-hosts-prepare
+
+
+# 00 -  create global prompt
+- import_tasks: set-new-prompt.yml
+
+# 01 - Normal DNS configuration
+- import_tasks: dns/cleanup-resolv.yml
+- import_tasks: dns/fix-dns.yml
+
+# 02 - Create /etc/hosts file
+- import_tasks: dns/config-etc-hosts.yml
+
+# 03 - Proxy configuration
+- import_tasks: proxy/proxy-yum.yml
+  when: config_yum_proxy
+
+- import_tasks: proxy/proxy-system.yml
+  when: config_system_proxy
+
+# 04 - Remove all existing repositories if redhat (optional)
+#
+# 05 - Install packages
+- import_tasks: install-packages.yml
+
+# 06 - Configure dnsmasq
+- import_tasks: dns/dnsmasq-config.yml
+
+# 07 - Enable dnsmasq and docker
+- import_tasks: services/enable-services.yml
+
+# 08 - Configure docker storage
+- import_tasks: docker/config-docker-storage.yml
+  when: config_docker_storage
+
+# 09 - Configure docker proxy
+- import_tasks: proxy/proxy-docker.yml
+  when: config_docker_proxy
+
+
+# 10 - Start docker and dnsmasq services
+- import_tasks: services/start-services.yml
+
+# 11 - Restart network and NetworkManager
+- import_tasks: services/restart-network-services.yml

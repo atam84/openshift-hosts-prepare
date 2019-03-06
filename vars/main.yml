@@ -1,0 +1,62 @@
+---
+# vars file for openshift-hosts-prepare
+set_new_prompt: True
+
+# this will perform a remove of existing repos
+dont_remove_existing_repos: True
+
+
+etc_hosts_file_contents:
+- "192.168.122.33 dns-server.mylab.local"
+- "192.168.122.44 ansible.mylab.local"
+- "192.168.122.100 poc-lb.local.net"
+- "192.168.122.101 poc-master.local.net"
+- "192.168.122.102 poc-compute-01.local.net"
+
+
+# Docker storage configuration
+config_docker_storage: False
+host_block_device: "/dev/vdb"
+host_vg: "vg_docker"
+
+# Dns and Dnsmasq configuration
+local_dns: "192.168.122.33"
+domain_name: local.net
+sub_domain_name: "apps.local.net"
+configure_dnsmasq: True
+
+# proxy configuration
+http_proxy: "192.168.122.254"
+https_proxy: "192.168.122.254"
+http_proxy_port: "8080"
+https_proxy_port: "8080"
+proxy_username: "atam84"
+proxy_password: "atam84"
+no_proxy: ".local.net,.mylab.local"
+config_docker_proxy: False
+config_yum_proxy: False
+config_system_proxy: False
+
+# list of packages to install
+packages_list:
+- centos-release-openshift-origin311 
+- epel-release
+- pyOpenSSL 
+- wget
+- curl
+- vim
+- git
+- net-tools
+- bind-utils
+- docker-1.13.1
+- dnsmasq
+- parted
+
+# list of network services that need to be restarted
+network_services:
+- network
+- NetworkManager
+
+services_list:
+- docker
+- dnsmasq

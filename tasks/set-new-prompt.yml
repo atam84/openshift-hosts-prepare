@@ -1,0 +1,6 @@
+---
+- name: '[00] - Create custom prompt (just for fun)'
+  copy:
+    content: 'export PS1="\n[\e[1;97mPath: \e[92m\w\e[0m]\n[\e[1;93m\h\e[0m] ~ \e[96m\u\e[0m \e[1;91m-> \e[0m"'
+    dest: /etc/profile.d/customprompt.sh
+  when: set_new_prompt
